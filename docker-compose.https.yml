@@ -28,6 +28,7 @@ services:
       - data:/data
       - models:/data/models
       - outputs:/data/outputs
+      - venv:/opt/venv
     deploy:
       resources:
         reservations:
@@ -75,3 +76,4 @@ volumes:
   data:        # settings, styles, embeddings, extensions and download caches
   models:      # checkpoints, LoRA, VAE, upscalers, ... (4-7 GB per checkpoint)
   outputs:     # generated images
+  venv:        # Python packages, including those extensions install (seeded from the image on first use)
