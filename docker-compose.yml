@@ -1,0 +1,34 @@
+# poly-stable-diffusion-webui on an NVIDIA GPU, over plain HTTP.
+#
+#   cp .env.example .env      # optional: port, webui flags, ...
+#   docker compose up -d --build
+#   http://<host>:7860
+#
+# For HTTPS, use docker-compose.https.yml instead.
+
+services:
+  app:
+    build: .
+    image: poly-stable-diffusion-webui:latest
+    restart: unless-stopped
+    ports:
+      - "${PORT:-7860}:7860"
+    environment:
+      COMMANDLINE_ARGS: ${COMMANDLINE_ARGS:-}
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - data:/data
+      - models:/data/models
+      - outputs:/data/outputs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  data:        # settings, styles, embeddings, extensions and download caches
+  models:      # checkpoints, LoRA, VAE, upscalers, ... (4-7 GB per checkpoint)
+  outputs:     # generated images

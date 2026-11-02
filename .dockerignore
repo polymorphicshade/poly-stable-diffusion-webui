@@ -1,0 +1,49 @@
+.git
+.github
+**/__pycache__
+docker
+certs
+.env
+.env.*
+Dockerfile
+docker-compose*.yml
+NVIDIA.sh
+
+# Left behind by running the webui locally from this folder. In the container, user data lives
+# under /data instead.
+venv
+repositories
+tmp
+outputs
+log
+cache
+config_states
+interrogate
+textual_inversion
+node_modules
+config.json
+ui-config.json
+cache.json*
+params.txt
+styles.csv*
+user.css
+webui-user.bat
+webui-user.sh
+webui.settings.bat
+sysinfo-*.json
+trace.json
+test/test_outputs
+
+# Model weights, wherever they were put. The small models the repository ships are kept.
+**/*.safetensors
+**/*.ckpt
+**/*.pth
+**/*.pt
+**/*.bin
+**/*.gguf
+**/*.onnx
+!models/VAE-approx/model.pt
+embeddings/*
+!embeddings/Place Textual Inversion embeddings here.txt
+extensions/*
+!extensions/put extensions here.txt
