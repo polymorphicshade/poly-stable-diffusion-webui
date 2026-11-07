@@ -431,6 +431,13 @@ def prepare_environment():
         startup_timer.record("install requirements_for_npu")
 
     if not args.skip_install:
+        from modules import bundled_extensions
+
+        if not (args.skip_bundled_extensions or args.disable_all_extensions or args.disable_extra_extensions):
+            bundled_extensions.install_missing()
+            startup_timer.record("install bundled extensions")
+
+        bundled_extensions.apply_pip_constraints()
         run_extensions_installers(settings_file=args.ui_settings_file)
 
     if args.update_check:

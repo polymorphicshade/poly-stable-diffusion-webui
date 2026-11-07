@@ -1,0 +1,10 @@
+# pip constraints applied while extensions install their packages (see modules/bundled_extensions.py).
+#
+# The installed torch, torchvision and numpy are pinned to their current versions on top of
+# these, so an extension cannot replace the CUDA torch build or move to numpy 2, which the
+# webui's compiled packages don't support. An extension that needs something these rule out
+# fails to install its packages, with a message, instead of breaking the webui.
+
+# ADetailer and ControlNet use mediapipe's legacy "solutions" API. 0.10.14 is the newest release
+# known to work with both (ADetailer requires >= 0.10.13).
+mediapipe==0.10.14

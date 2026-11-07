@@ -160,6 +160,38 @@ git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui
 
 Find the instructions [here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon).
 
+### Bundled extensions
+
+These extensions are installed automatically on every launch, by `webui.bat`/`webui.sh` and in Docker:
+
+| Extension | What it does |
+|---|---|
+| [ControlNet](https://github.com/Mikubill/sd-webui-controlnet) | Guidance from poses, edges, depth maps and line art. Its preprocessors include DWPose, Depth Anything and MobileSAM |
+| [After Detailer](https://github.com/Bing-su/adetailer) | Detects faces, hands and people, and inpaints them |
+| [Regional Prompter](https://github.com/hako-mikan/sd-webui-regional-prompter) | Separate prompts for regions of the canvas |
+| [Ultimate SD Upscale](https://github.com/Coyote-A/ultimate-upscale-for-automatic1111) | Tile-by-tile upscaling |
+| [Tiled Diffusion & VAE](https://github.com/pkuliyi2015/multidiffusion-upscaler-for-automatic1111) | Very large images within limited VRAM |
+| [Dynamic Prompts](https://github.com/adieyal/sd-dynamic-prompts) | Wildcards and combinatorial prompts |
+| [Civitai Helper](https://github.com/butaixianran/Stable-Diffusion-Webui-Civitai-Helper) | Previews, trigger words and metadata from Civitai |
+| [Tag Complete](https://github.com/DominikDoom/a1111-sd-webui-tagcomplete) | Autocompletes Danbooru tags, wildcards and LoRA names |
+| [Aspect Ratio selector](https://github.com/alemelis/sd-webui-ar) | Resolution and aspect ratio buttons |
+| [OpenPose Editor](https://github.com/huchenlei/sd-webui-openpose-editor) | Skeleton poser for ControlNet |
+| [ReActor](https://codeberg.org/Gourieff/sd-webui-reactor) | Face swapping |
+| [Infinite Image Browsing](https://github.com/zanllp/sd-webui-infinite-image-browsing) | Gallery with search and generation info |
+| [Lobe Theme](https://github.com/lobehub/sd-webui-lobe-theme) | Modern light/dark interface |
+| [System Info](https://github.com/vladmandic/sd-extension-system-info) | VRAM, RAM, temperature and benchmark stats |
+| [Rembg](https://github.com/AUTOMATIC1111/stable-diffusion-webui-rembg) | Background removal (Extras tab) |
+| [FreeU](https://github.com/ljleb/sd-webui-freeu) | Color and detail boost at no speed cost |
+| [Model Preset Manager](https://github.com/rifeWithKaiju/model_preset_manager) | Saved generation settings per model |
+| [Segment Anything](https://github.com/continue-revolution/sd-webui-segment-anything) | Click and text mask generation |
+| [openOutpaint](https://github.com/zero01101/openOutpaint-webUI-extension) | Infinite-canvas outpainting workspace |
+
+- **How:** the list is in [bundled-extensions.txt](bundled-extensions.txt), each extension pinned to a tested commit. On start, `launch.py` clones any that are missing into the extensions folder, and each one's `install.py` installs its Python packages. The first start takes a while and needs network access; later starts find everything in place. Update extensions from the Extensions tab as usual.
+- **Removing one:** disable it in the Extensions tab, or delete its folder: a deleted bundled extension is not installed again unless you also delete `extensions/.bundled-extensions.json`. `--skip-bundled-extensions` turns automatic installation off.
+- **Models:** ControlNet models go in `models/ControlNet`, and SAM models for Segment Anything in `models/sam` (in Docker: `docker compose cp sam_vit_h_4b8939.pth app:/data/models/sam/`). Neither is downloaded for you. ADetailer's detectors, ControlNet's preprocessors and ReActor's face-swap model download by themselves.
+- **openOutpaint** needs the `--api` flag. The Docker image always runs with it.
+- **Package safety:** while extensions install packages, pip is held to the installed torch, torchvision and numpy (plus [bundled-extensions-constraints.txt](bundled-extensions-constraints.txt)), so an extension can't replace the CUDA build of torch or pull in numpy 2.
+
 ### Docker (Linux server)
 
 There are two compose files. Both run the web UI and its API on an NVIDIA GPU. The host needs Docker, the NVIDIA driver and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html). On Ubuntu or Debian, `sudo ./NVIDIA.sh` installs all three and checks that a container can see the GPU.
@@ -186,7 +218,7 @@ The UI is then at `https://<host>:8443`.
 - **Certificate:** a self-signed certificate is generated into `./certs` on first boot, so the browser warns once until you accept it. Every address you type in the browser must be in `TLS_SAN`, e.g. `IP:192.168.1.99`. After changing it, delete `./certs` and restart to mint a new one. To use a CA-issued certificate, put `fullchain.pem` and `privkey.pem` in `./certs`.
 - **Ports:** in the HTTPS stack, 7860 is the app's plain HTTP listener and is published on `127.0.0.1` only. `https://<host>:7860` fails with `SSL_ERROR_RX_RECORD_TOO_LONG` because nothing there speaks TLS. Change either port with `HTTPS_PORT` and `PORT` in `.env`.
 - **Storage:** the container runs with `--data-dir /data`. Checkpoints, LoRA, VAE and upscalers go in the `models` volume, generated images in the `outputs` volume, and settings, styles, embeddings, extensions and download caches in the `data` volume. Both stacks share these volumes. If no checkpoint is present, the SD 1.5 checkpoint (~4 GB) downloads on first start. To add a model, copy it in, then refresh the checkpoint list in the UI: `docker compose cp model.safetensors app:/data/models/Stable-diffusion/`.
-- **Extensions:** extensions are cloned into the `data` volume, and the Python packages they install go into the `venv` volume, so both survive rebuilds and `docker compose down`. The catch: the `venv` volume is filled from the image only once, so a rebuild that changes the image's packages (new `requirements_versions.txt`, a different `TORCH_COMMAND`) is ignored until you delete it: `docker compose down`, `docker volume rm <project>_venv`, then `up -d --build`. Extensions reinstall their packages on the next start.
+- **Extensions:** the [bundled extensions](#bundled-extensions) and their packages are installed in the image, and new volumes start with them. Volumes from an older image get them on the next start: the extensions are copied from the image, with no download, and their packages install into the `venv` volume, which takes several minutes once. Extensions are cloned into the `data` volume, and the Python packages they install go into the `venv` volume, so both survive rebuilds and `docker compose down`. The catch: the `venv` volume is filled from the image only once, so a rebuild that changes the image's packages (new `requirements_versions.txt`, a different `TORCH_COMMAND`) is ignored until you delete it: `docker compose down`, `docker volume rm <project>_venv`, then `up -d --build`. Extensions reinstall their packages on the next start.
 - **Settings:** the webui always starts with `--listen --port 7860 --api --data-dir /data`. `COMMANDLINE_ARGS` in `.env` adds flags, for example `--xformers --medvram`, or `--gradio-auth user:password --api-auth user:password`. Installing extensions from the UI is off when the webui listens on the network; `--enable-insecure-extension-access` turns it on. `HF_TOKEN` speeds up downloads.
 - **Restart:** the UI's restart button works. The process exits, and the container's restart policy starts it again.
 - **GPUs:** the image uses the webui's default torch (2.1.2, CUDA 12.1), which supports GPUs from Maxwell to Ada. For Blackwell (RTX 50xx), build with a CUDA 12.8 torch: `docker compose build --build-arg TORCH_COMMAND="pip install torch==2.7.1 torchvision==0.22.1 --extra-index-url https://download.pytorch.org/whl/cu128"`, then start with `docker compose up -d`. Leave out `--build` there, because it would rebuild with the default torch. Don't add `--xformers` with this torch: the xformers version the webui installs is built for torch 2.1.2.

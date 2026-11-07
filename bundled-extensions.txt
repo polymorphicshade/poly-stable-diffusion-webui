@@ -1,0 +1,85 @@
+# Extensions installed automatically on every launch (see modules/bundled_extensions.py).
+#
+# Format, one per line:   <folder name>   <git URL>   [commit]
+#
+# On start, launch.py installs each listed extension that is not in the extensions folder yet:
+# it clones the repository (with submodules) and checks out the pinned commit, so every install
+# gets the same, tested code. The extension's own install.py then installs its Python packages,
+# as for any extension. Extensions already present are left alone: update them from the
+# Extensions tab as usual.
+#
+# An extension you remove from the extensions folder stays removed; delete
+# extensions/.bundled-extensions.json to have every missing one installed again. Disable one in
+# the Extensions tab to keep it installed but not loaded. --skip-bundled-extensions turns all of
+# this off.
+#
+# To add one, append a line; to move one to a newer version, change its commit (or drop the
+# commit to take whatever is current when it is first installed).
+
+# ControlNet: structural guidance from poses, edges, depth maps, line art, ... Its preprocessors
+# include DWPose, Depth Anything (v1 and v2), MobileSAM segmentation and the other
+# "controlnet_aux" annotators, so no separate preprocessor extension is needed. Preprocessor
+# weights download on first use; ControlNet models go in models/ControlNet.
+sd-webui-controlnet                          https://github.com/Mikubill/sd-webui-controlnet.git                         56cec5b2958edf3b1807b7e7b2b1b5186dbd2f81
+
+# After Detailer: automatic face, hand and person detection and inpainting. Detection models
+# download on first start.
+adetailer                                    https://github.com/Bing-su/adetailer.git                                    3a599f5d4607d8f9d8b9fc5a15526197418dae1a
+
+# Regional Prompter: separate prompts for regions of the canvas.
+sd-webui-regional-prompter                   https://github.com/hako-mikan/sd-webui-regional-prompter.git                9d6c1f445acaabff7ce8ac57109d1234de0cafa6
+
+# Ultimate SD Upscale: tile-by-tile high-resolution upscaling (img2img "Script" menu).
+ultimate-upscale-for-automatic1111           https://github.com/Coyote-A/ultimate-upscale-for-automatic1111.git          2322caa480535b1011a1f9c18126d85ea444f146
+
+# Tiled Diffusion & Tiled VAE: very large images within limited VRAM.
+multidiffusion-upscaler-for-automatic1111    https://github.com/pkuliyi2015/multidiffusion-upscaler-for-automatic1111.git 22798f6822bc9c8a905b51da8954ee313b973331
+
+# Dynamic Prompts: wildcards, {a|b} variants and combinatorial prompts.
+sd-dynamic-prompts                           https://github.com/adieyal/sd-dynamic-prompts.git                           de056ff8d80e4ad120e13a90cf200f3383f427c6
+
+# Civitai Helper: previews, trigger words and metadata for local models from Civitai.
+Stable-Diffusion-Webui-Civitai-Helper        https://github.com/butaixianran/Stable-Diffusion-Webui-Civitai-Helper.git   e33b1c5cf7091ec1e5d95240350d59a6f360fe4b
+
+# Tag Complete: autocompletion of Danbooru tags, wildcards, embeddings and LoRA names.
+a1111-sd-webui-tagcomplete                   https://github.com/DominikDoom/a1111-sd-webui-tagcomplete.git               4170882f90b47be130a0ff9314f663c230b9153d
+
+# Aspect Ratio selector: resolution and aspect ratio buttons next to width/height. (The other
+# candidate, sd-webui-aspect-ratio-helper, is archived; installing both duplicates the buttons.)
+sd-webui-ar                                  https://github.com/alemelis/sd-webui-ar.git                                 3973c86a7a0f9722b5f61dd1a141ba6821f60245
+
+# OpenPose Editor: interactive skeleton poser that sends poses to ControlNet. Downloads its
+# front end from the project's GitHub releases on first start.
+sd-webui-openpose-editor                     https://github.com/huchenlei/sd-webui-openpose-editor.git                   0026f453f9ac9b7dec64129d2f2b83b04030c645
+
+# ReActor: face swapping. GitHub disabled the original repository; the author publishes it on
+# Codeberg. Its install.py downloads the inswapper_128 model (~530 MB) into models/insightface.
+sd-webui-reactor                             https://codeberg.org/Gourieff/sd-webui-reactor.git                          3b80d547416034da34959256b888d45e4b188de5
+
+# Infinite Image Browsing: fast gallery with search and generation-info loading.
+sd-webui-infinite-image-browsing             https://github.com/zanllp/sd-webui-infinite-image-browsing.git              3d6a0558b33d17490faa2112296391dcb5ce9df5
+
+# Lobe Theme: modern light/dark interface. Replaces the default look; disable it in the
+# Extensions tab to get the stock UI back.
+sd-webui-lobe-theme                          https://github.com/lobehub/sd-webui-lobe-theme.git                          8a5861a33258af0698532de1efe47ca5ffebf37d
+
+# System Info: VRAM, RAM, GPU temperature and benchmark stats.
+sd-extension-system-info                     https://github.com/vladmandic/sd-extension-system-info.git                  006f08f499bbe69c484f0f1cc332bbf0e75526c2
+
+# Rembg: background removal (Extras tab). Models download on first use.
+stable-diffusion-webui-rembg                 https://github.com/AUTOMATIC1111/stable-diffusion-webui-rembg.git           a4c07b857e73f3035f759876797fa6de986def3d
+
+# FreeU: color and detail boost at no speed cost.
+sd-webui-freeu                               https://github.com/ljleb/sd-webui-freeu.git                                 75684923858445df87f7287192731e57d09def81
+
+# Model Preset Manager: saved generation settings per model.
+model_preset_manager                         https://github.com/rifeWithKaiju/model_preset_manager.git                   4e25eebd4b24fb903d2815ac30b787f37a98923c
+
+# Segment Anything: click/text mask generation. SAM weights are not downloaded automatically:
+# put one (e.g. sam_vit_h_4b8939.pth) in models/sam. GroundingDINO, for text prompts, downloads
+# on first use.
+sd-webui-segment-anything                    https://github.com/continue-revolution/sd-webui-segment-anything.git        982138cfb505de61a3cbb257b2fa9d461d9b5493
+
+# openOutpaint: infinite-canvas inpainting/outpainting workspace. Needs the --api flag. The
+# canvas itself is a git submodule, cloned along with the extension.
+openOutpaint-webUI-extension                 https://github.com/zero01101/openOutpaint-webUI-extension.git               3449ae8559c0f270d49ceb3ef7234f62feaac675

@@ -55,15 +55,32 @@ COPY --chown=app:app requirements_versions.txt ./
 RUN pip install -r requirements_versions.txt wheel \
     && pip install --no-build-isolation ${CLIP_PACKAGE}
 
-# launch.py does the rest of the setup: CLIP, open_clip and the repositories it clones. It runs
-# again on every start, finds everything in place and moves on.
+# onnxruntime for the extensions that use it (ReActor, ControlNet's DWPose, Rembg). ReActor
+# requires exactly this CUDA 12 build, from Microsoft's feed, whenever it sees a GPU.
+ARG ONNXRUNTIME_PACKAGE=onnxruntime-gpu==1.17.1
+ARG ONNXRUNTIME_INDEX_URL=https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
+
+# launch.py does the rest of the setup: CLIP, open_clip, the repositories it clones, and the
+# extensions in bundled-extensions.txt with the packages their install.py scripts install. It
+# runs again on every start, finds everything in place and moves on.
+#
+# The pip cache mount only speeds up rebuilds; it is not part of the image. There is no GPU
+# while building, so the extensions install the CPU onnxruntime and ReActor records "CPU" as
+# its device; both are put right afterwards. ReActor's face-swap model is a download like any
+# other model weights, so it is removed here and fetched into the models volume on first start.
 COPY --chown=app:app . .
-RUN python launch.py --skip-torch-cuda-test --exit \
+RUN --mount=type=cache,target=/home/app/.cache/pip,uid=1000,gid=1000 \
+    env -u PIP_NO_CACHE_DIR python launch.py --skip-torch-cuda-test --exit \
+    && pip uninstall -y onnxruntime onnxruntime-gpu \
+    && env -u PIP_NO_CACHE_DIR pip install ${ONNXRUNTIME_PACKAGE} --extra-index-url ${ONNXRUNTIME_INDEX_URL} \
+    && rm -f extensions/*/last_device.txt \
+    && rm -rf models/insightface \
     && find /opt/venv /app -name "__pycache__" -type d -prune -exec rm -rf {} +
 
-# Seed /data with the repository's placeholders and small bundled models (VAE-approx, karlo).
-# A new, empty named volume is initialised from this.
-RUN mkdir -p /data/models /data/embeddings /data/extensions /data/outputs /data/cache \
+# Seed /data with the repository's placeholders, small bundled models (VAE-approx, karlo) and
+# the bundled extensions. A new, empty named volume is initialised from this. A data volume
+# from an older image gets missing bundled extensions copied from /app/extensions on start.
+RUN mkdir -p /data/models/sam /data/models/ControlNet /data/embeddings /data/extensions /data/outputs /data/cache \
     && cp -a models/. /data/models/ \
     && cp -a embeddings/. /data/embeddings/ \
     && cp -a extensions/. /data/extensions/
@@ -81,8 +98,9 @@ WORKDIR /app
 VOLUME ["/data", "/data/models", "/data/outputs"]
 EXPOSE 7860
 
-# The first start downloads the SD 1.5 checkpoint (~4 GB) before the server listens.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=600s --retries=3 \
+# The first start downloads the SD 1.5 checkpoint (~4 GB) before the server listens, and with
+# a venv volume from an older image, installs the extensions' packages too.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=1200s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/internal/ping', timeout=4)"
 
 # Extra webui flags (e.g. "--xformers --medvram") go in COMMANDLINE_ARGS, which launch.py appends
