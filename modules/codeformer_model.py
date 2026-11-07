@@ -46,7 +46,7 @@ class FaceRestorerCodeFormer(face_restoration_utils.CommonFaceRestoration):
 
     def restore(self, np_image, w: float | None = None):
         if w is None:
-            w = getattr(shared.opts, "code_former_weight", 0.5)
+            w = getattr(shared.opts, "code_former_weight", 0)
 
         def restore_face(cropped_face_t):
             assert self.net is not None

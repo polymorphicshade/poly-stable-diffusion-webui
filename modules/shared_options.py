@@ -108,9 +108,9 @@ options_templates.update(options_section(('upscaling', "Upscaling", "postprocess
 }))
 
 options_templates.update(options_section(('face-restoration', "Face restoration", "postprocessing"), {
-    "face_restoration": OptionInfo(False, "Restore faces", infotext='Face restoration').info("will use a third-party model on generation result to reconstruct faces"),
+    "face_restoration": OptionInfo(True, "Restore faces", infotext='Face restoration').info("will use a third-party model on generation result to reconstruct faces"),
     "face_restoration_model": OptionInfo("CodeFormer", "Face restoration model", gr.Radio, lambda: {"choices": [x.name() for x in shared.face_restorers]}),
-    "code_former_weight": OptionInfo(0.5, "CodeFormer weight", gr.Slider, {"minimum": 0, "maximum": 1, "step": 0.01}).info("0 = maximum effect; 1 = minimum effect"),
+    "code_former_weight": OptionInfo(0, "CodeFormer weight", gr.Slider, {"minimum": 0, "maximum": 1, "step": 0.01}).info("0 = maximum effect; 1 = minimum effect"),
     "face_restoration_unload": OptionInfo(False, "Move face restoration model from VRAM into RAM after processing"),
 }))
 
