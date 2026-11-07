@@ -59,10 +59,6 @@ sd-webui-reactor                             https://codeberg.org/Gourieff/sd-we
 # Infinite Image Browsing: fast gallery with search and generation-info loading.
 sd-webui-infinite-image-browsing             https://github.com/zanllp/sd-webui-infinite-image-browsing.git              3d6a0558b33d17490faa2112296391dcb5ce9df5
 
-# Lobe Theme: modern light/dark interface. Replaces the default look; disable it in the
-# Extensions tab to get the stock UI back.
-sd-webui-lobe-theme                          https://github.com/lobehub/sd-webui-lobe-theme.git                          8a5861a33258af0698532de1efe47ca5ffebf37d
-
 # System Info: VRAM, RAM, GPU temperature and benchmark stats.
 sd-extension-system-info                     https://github.com/vladmandic/sd-extension-system-info.git                  006f08f499bbe69c484f0f1cc332bbf0e75526c2
 

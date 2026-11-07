@@ -178,7 +178,6 @@ These extensions are installed automatically on every launch, by `webui.bat`/`we
 | [OpenPose Editor](https://github.com/huchenlei/sd-webui-openpose-editor) | Skeleton poser for ControlNet |
 | [ReActor](https://codeberg.org/Gourieff/sd-webui-reactor) | Face swapping |
 | [Infinite Image Browsing](https://github.com/zanllp/sd-webui-infinite-image-browsing) | Gallery with search and generation info |
-| [Lobe Theme](https://github.com/lobehub/sd-webui-lobe-theme) | Modern light/dark interface |
 | [System Info](https://github.com/vladmandic/sd-extension-system-info) | VRAM, RAM, temperature and benchmark stats |
 | [Rembg](https://github.com/AUTOMATIC1111/stable-diffusion-webui-rembg) | Background removal (Extras tab) |
 | [FreeU](https://github.com/ljleb/sd-webui-freeu) | Color and detail boost at no speed cost |
